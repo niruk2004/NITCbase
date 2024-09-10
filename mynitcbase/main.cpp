@@ -214,6 +214,21 @@ void STAGE6(){
   */
 }
 
+void tips(){
+  /*
+  Disk::readblock is used at 3 places - blockbuffer (for loadblockandgetbufferptr if it wasnt in buffer so we have to load into 
+                  buffer for that we use read) , staticbuffer(for copying block map from diskin the staticbuffer costructor and
+                  in the disk.cpp for defining)
+  
+
+  Disk::writeblock is used at 4 places - 2 times in destructor of staticbuffer (one to writeback blockmap and other if its dirty),
+                  and one time at getfreebuffer (check if dirty while replacing and do it if true) and then in disk.cpp for defining
+                  the writeblock
+          
+  linearsearch  in select for printing, rename relation ,  rename attribute,  search in blockaccess, deleterelation, openreltable 
+                openrel function and in schema for createrel
+  */
+}
 int main(int argc, char *argv[]) {
   Disk disk_run;
   StaticBuffer buffer;

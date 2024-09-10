@@ -128,7 +128,7 @@ int BlockBuffer::loadBlockAndGetBufferPtr(unsigned char **buffPtr) {
   int bufferNum = StaticBuffer::getBufferNum(this->blockNum);
   if (bufferNum !=E_BLOCKNOTINBUFFER){
     for(int i=0;i<BUFFER_CAPACITY;++i){
-      StaticBuffer::metainfo[bufferNum].timeStamp+=1;
+      StaticBuffer::metainfo[i].timeStamp+=1; //this actually doesnt matter coz we are updating the buffernum's timestamp to 0
     }
     StaticBuffer::metainfo[bufferNum].timeStamp = 0;
   }
