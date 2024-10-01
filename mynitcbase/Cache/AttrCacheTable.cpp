@@ -47,7 +47,6 @@ void AttrCacheTable::recordToAttrCatEntry(union Attribute record[ATTRCAT_NO_ATTR
   attrCatEntry->rootBlock = (int) record[ATTRCAT_ROOT_BLOCK_INDEX].nVal;
   attrCatEntry->offset = (int) record[ATTRCAT_OFFSET_INDEX].nVal;
   attrCatEntry->primaryFlag = (bool) record[ATTRCAT_PRIMARY_FLAG_INDEX].nVal;
-  //which one is bool? nval or sval? 
 }
 
 
@@ -105,3 +104,5 @@ void AttrCacheTable::attrCatEntryToRecord(AttrCatEntry *attrCatEntry, Attribute 
 
     // copy the rest of the fields in the record to the attrCacheEntry struct
 }
+
+

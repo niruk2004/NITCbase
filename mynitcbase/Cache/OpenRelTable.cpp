@@ -421,7 +421,6 @@ int OpenRelTable::openRel(char relName[ATTR_SIZE]) {
 	// update the recId field of this Relation Cache entry to relcatRecId.
 	relCacheBuffer->recId.block = relcatRecId.block;
 	relCacheBuffer->recId.slot = relcatRecId.slot;
-	
 	// use the Relation Cache entry to set the relId-th entry of the RelCacheTable.
 	RelCacheTable::relCache[relId] = relCacheBuffer;	
 

@@ -719,6 +719,7 @@ NOTE: the caller is expected to allocate space for the argument `record` based
       on the size of the relation. This function will only copy the result of
       the projection onto the array pointed to by the argument.
 */
+
 int BlockAccess::project(int relId, Attribute *record) {
     // get the previous search index of the relation relId from the relation
     // cache (use RelCacheTable::getSearchIndex() function)
@@ -781,13 +782,13 @@ int BlockAccess::project(int relId, Attribute *record) {
             //        set block = -1 and fail the loop condition )
             block = blockheadinfo.rblock;
             slot = 0;
-            continue;
+            
         }
         else if (slotmap[slot]==SLOT_UNOCCUPIED/* slot is free */)
         { // (i.e slot-th entry in slotMap contains SLOT_UNOCCUPIED)
             // increment slot
             slot++;
-            continue;
+            
         }
         else {
             // (the next occupied slot / record has been found)
@@ -813,3 +814,5 @@ int BlockAccess::project(int relId, Attribute *record) {
     recbuffer.getRecord(record,slot);
     return SUCCESS;
 }
+
+
