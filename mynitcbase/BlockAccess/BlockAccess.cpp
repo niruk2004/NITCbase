@@ -470,11 +470,56 @@ NOTE: This function will copy the result of the search to the `record` argument.
 int BlockAccess::search(int relId, Attribute *record, char attrName[ATTR_SIZE], Attribute attrVal, int op) {
     // Declare a variable called recid to store the searched record
     RecId recId;
-    
-    /* search for the record id (recid) corresponding to the attribute with
-    attribute name attrName, with value attrval and satisfying the condition op
-    using linearSearch() */
-    recId = BlockAccess::linearSearch(relId, attrName, attrVal, op);
+
+
+    //shit that was before this
+
+    // /* search for the record id (recid) corresponding to the attribute with
+    // attribute name attrName, with value attrval and satisfying the condition op
+    // using linearSearch() */
+    // recId = BlockAccess::linearSearch(relId, attrName, attrVal, op);
+
+    //end of shit
+
+
+
+    /* get the attribute catalog entry from the attribute cache corresponding
+    to the relation with Id=relid and with attribute_name=attrName  */
+    // if this call returns an error, return the appropriate error code
+    AttrCatEntry attrcatbuf;
+    int ret=AttrCacheTable::getAttrCatEntry(relId,attrName,&attrcatbuf);
+	if(ret!=SUCCESS){
+		return ret;
+	}
+
+    // // get rootBlock from the attribute catalog entry
+    // /* if Index does not exist for the attribute (check rootBlock == -1) */ {
+
+    //     /* search for the record id (recid) corresponding to the attribute with
+    //        attribute name attrName, with value attrval and satisfying the
+    //        condition op using linearSearch()
+    //     */
+    // }
+    if(attrcatbuf.rootBlock==-1){
+        recId = BlockAccess::linearSearch(relId, attrName, attrVal, op);
+    }
+
+    // /* else */ {
+    //     // (index exists for the attribute)
+
+    //     /* search for the record id (recid) correspoding to the attribute with
+    //     attribute name attrName and with value attrval and satisfying the
+    //     condition op using BPlusTree::bPlusSearch() */
+    // }
+    else{
+        recId = BPlusTree::bPlusSearch(relId,attrName,attrVal,op);
+    }
+
+
+
+
+
+
     // if there's no record satisfying the given condition (recId = {-1, -1})
     //    return E_NOTFOUND;
     if (recId.block == -1 and recId.slot == -1){
@@ -485,7 +530,7 @@ int BlockAccess::search(int relId, Attribute *record, char attrName[ATTR_SIZE], 
        call the appropriate method to fetch the record
     */
     RecBuffer recBuffer(recId.block);
-    int ret = recBuffer.getRecord(record, recId.slot);
+    ret = recBuffer.getRecord(record, recId.slot);
     if (ret != SUCCESS){
       return ret;
     }

@@ -82,7 +82,6 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE],
     attr_types[i] = srcAttrCatEntry.attrType;
   }
 
-//here there was a problem in creating the targetrel saying there was duplicate attributes found! how???
   int ret = Schema::createRel(targetRel, src_nAttrs, attr_names, attr_types);
   if (ret != SUCCESS)
     return ret;
@@ -92,11 +91,10 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE],
     Schema::deleteRel(targetRel);
     return targetRelId;
   }
-  // RelCacheTable::resetSearchIndex(targetRelId);
   Attribute record[src_nAttrs];
 
   RelCacheTable::resetSearchIndex(srcRelId);
-  //AttrCacheTable::resetSearchIndex(srcRelId, attr);
+  AttrCacheTable::resetSearchIndex(srcRelId, attr);
 
   while (BlockAccess::search(srcRelId, record, attr, attrVal, op) == SUCCESS) {
     ret = BlockAccess::insert(targetRelId, record);
