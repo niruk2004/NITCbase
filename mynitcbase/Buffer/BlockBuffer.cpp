@@ -323,7 +323,7 @@ BlockBuffer::BlockBuffer(char blockType){
     // set the blockNum field of the object to that of the allocated block
     // number if the method returned a valid block number,
     // otherwise set the error code returned as the block number.
-    if (blocknum>0 || blocknum>=DISK_BLOCKS){
+    if (blocknum<0 || blocknum>=DISK_BLOCKS){
       std::cout << "Error: assigned block is not in range\n";
       this->blockNum=blocknum;
       return;

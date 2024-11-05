@@ -65,13 +65,13 @@ int StaticBuffer::getFreeBuffer(int blockNum) {
   int allocatedBuffer=-1;
 
 // increase the timeStamp in metaInfo of all occupied buffers.
-  for( int  i=0;i<MAX_OPEN;++i){
+  for( int  i=0;i<BUFFER_CAPACITY;++i){
     if(metainfo[i].free != false){
       metainfo[i].timeStamp+=1;
     }
   }
   int timestamp = 0,replacer =0 ;
-  for(int j=0;j<MAX_OPEN;++j){
+  for(int j=0;j<BUFFER_CAPACITY;++j){
     if(metainfo[j].free == true){
       allocatedBuffer = j;
       break;
