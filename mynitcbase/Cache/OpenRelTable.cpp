@@ -541,22 +541,56 @@ int OpenRelTable::closeRel(int relId) {
   free(RelCacheTable::relCache[relId]);
 
 
-  //attrcache
+  
+    /****** Releasing the Attribute Cache entry of the relation ******/
 
   // update `tableMetaInfo` to set `relId` as a free slot
   AttrCacheEntry *head = AttrCacheTable::attrCache[relId];
   AttrCacheEntry *next = head->next;
-  while (next) {
+
+   // for all the entries in the linked list of the relIdth Attribute Cache entry.
+
+
+   /*inside the while, if the condition was while(head), it would pose problem as next=next.next 
+   would show error if next is null (as null.next is not possible)*/ 
+  while (true) {
+
+    // if the entry has been modified:
+    if(head->dirty){
+
+
+      /* Get the Attribute Catalog entry from attrCache
+      Then convert it to a record using AttrCacheTable::attrCatEntryToRecord().
+      Write back that entry by instantiating RecBuffer class. Use recId
+      member field and recBuffer.setRecord() */
+      Attribute attrCatRecord [ATTRCAT_NO_ATTRS];
+			AttrCacheTable::attrCatEntryToRecord(&(head->attrCatEntry), attrCatRecord);
+			RecBuffer attrCatBlockBuffer (head->recId.block);
+			attrCatBlockBuffer.setRecord(attrCatRecord, head->recId.slot);
+
+
+    }
+
+
+    // free the memory dynamically alloted to this entry in Attribute
+    // Cache linked list and assign nullptr to that entry
     free(head);
     head = next;
+    if (head==NULL){
+      break;
+    }
     next = next->next;
+
+
   }
+  
   free(head);
 
 
 
 
-  // update `relCache` and `attrCache` to set the entry at `relId` to nullptr
+  /****** Updating metadata in the Open Relation Table of the relation  ******/
+
   tableMetaInfo[relId].free = true;
   AttrCacheTable::attrCache[relId] = nullptr;
   RelCacheTable::relCache[relId] = nullptr;

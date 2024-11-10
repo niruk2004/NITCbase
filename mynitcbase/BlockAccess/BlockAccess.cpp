@@ -423,6 +423,7 @@ int BlockAccess::insert(int relId, Attribute *record) {
             // update first block field in the relation catalog entry to the
             // new block (using RelCacheTable::setRelCatEntry() function) //this we did after the else block as we have to update the last block anyway
             relcatentry.firstBlk = rec_id.block;
+            RelCacheTable::setRelCatEntry(relId, &relcatentry);
             
         }
 
@@ -437,7 +438,7 @@ int BlockAccess::insert(int relId, Attribute *record) {
     RecBuffer blockbuffer(rec_id.block);
     int ret = blockbuffer.setRecord(record,rec_id.slot);
     if(ret!=SUCCESS){
-      printf("Record not saved successfully.\n"); //just in case the setrecord aint working properly
+      printf("Record NOT saved successfully.\n"); //just in case the setrecord aint working properly
     }
     /* update the slot map of the block by marking entry of the slot to
        which record was inserted as occupied) */
@@ -458,7 +459,44 @@ int BlockAccess::insert(int relId, Attribute *record) {
     // the relation. (use RelCacheTable::setRelCatEntry function)
     relcatentry.numRecs++;
     RelCacheTable::setRelCatEntry(relId,&relcatentry);
-    return SUCCESS;
+    //return SUCCESS;
+
+
+    //did on 11th stage!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    /* B+ Tree Insertions */
+    // (the following section is only relevant once indexing has been implemented)
+
+    int flag = SUCCESS;
+    // Iterate over all the attributes of the relation
+    // (let attrOffset be iterator ranging from 0 to numOfAttributes-1)
+    for(int attrOffset =0; attrOffset<numOfAttributes; attrOffset++)
+    {
+        // get the attribute catalog entry for the attribute from the attribute cache
+        // (use AttrCacheTable::getAttrCatEntry() with args relId and attrOffset)
+        AttrCatEntry attrCatEntry;
+        AttrCacheTable::getAttrCatEntry(relId, attrOffset, &attrCatEntry);
+
+        // get the root block field from the attribute catalog entry
+
+        // if index exists for the attribute(i.e. rootBlock != -1)
+        if(attrCatEntry.rootBlock != -1)
+        {
+            /* insert the new record into the attribute's bplus tree using
+             BPlusTree::bPlusInsert()*/
+            int retVal = BPlusTree::bPlusInsert(relId, attrCatEntry.attrName,
+                                                record[attrOffset], rec_id);
+
+            if (retVal == E_DISKFULL) {
+                //(index for this attribute has been destroyed)
+                // flag = E_INDEX_BLOCKS_RELEASED
+                flag = E_INDEX_BLOCKS_RELEASED;
+                BPlusTree::bPlusDestroy(attrCatEntry.rootBlock);
+            }
+        }
+    }
+
+    return flag;
 }
 
 
@@ -699,14 +737,12 @@ int BlockAccess::deleteRelation(char relName[ATTR_SIZE]) {
     
 
 
-
-/*
         // (the following part is only relevant once indexing has been implemented)
         // if index exists for the attribute (rootBlock != -1), call bplus destroy
         if (rootBlock != -1) {
             // delete the bplus tree rooted at rootBlock using BPlusTree::bPlusDestroy()
+            BPlusTree::bPlusDestroy(rootBlock);
         }
-*/
     }
 
 
@@ -859,5 +895,6 @@ int BlockAccess::project(int relId, Attribute *record) {
     recbuffer.getRecord(record,slot);
     return SUCCESS;
 }
+
 
 
